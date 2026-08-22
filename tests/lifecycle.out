@@ -1,0 +1,9 @@
+rows 500
+memory in use true
+peek true row 250
+spent step refused closed
+open after close false
+exec after close refused closed
+zombie count 500
+memory clean true
+lifecycle ok

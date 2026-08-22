@@ -1,0 +1,9 @@
+after commit alice 70 bob 80
+after rollback alice 70
+after abandoned bob 80
+broken transfer refused sqlite
+after broken alice 70
+double commit refused misuse
+nested begin refused sqlite
+carol 25
+transactions ok

@@ -1,0 +1,6 @@
+wrote up to rowid 2
+file exists true
+note 1: first note
+note 2: second note
+write on read-only refused readonly
+persistence ok

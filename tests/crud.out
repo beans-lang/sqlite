@@ -1,0 +1,14 @@
+version set true
+insert row pending false rowid 1
+user 1 ada age=36 score=99.5 avatar=4 bytes
+user 2 grace age=null score=null avatar=null
+user 3 চা ☕ age=1 score=0.25 avatar=null
+user 4 max age=9223372036854775807 score=-0.5 avatar=null
+blob round-trip true len 4
+grace age is null
+meta count 2 first ident type integer true
+updated 1
+deleted 1
+duplicate refused constraint
+typo refused sqlite
+crud ok

@@ -1,0 +1,11 @@
+module sqlite
+kind library
+
+# The whole of SQLite rides in one translation unit the toolchain compiles
+# for whatever target the consumer builds; nothing is prebuilt and no make
+# step exists. The vendored tree stays byte-identical to upstream — every
+# build choice is a #define inside this file.
+csrc all "src/beans_sqlite.c"
+
+# SQLITE_ENABLE_MATH_FUNCTIONS pulls in libm on Linux hosts.
+link linux library "m"
