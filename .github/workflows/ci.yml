@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Beans
+        run: |
+          curl -fsSL https://github.com/beans-lang/beans/releases/latest/download/beans-install.sh | sh
+          echo "$HOME/.beans/bin" >> "$GITHUB_PATH"
+
+      - name: Toolchain versions
+        run: |
+          beansc --version
+          clang --version | head -1
+
+      - name: Vendor integrity
+        run: |
+          printf '%s  vendor/sqlite3.c\n%s  vendor/sqlite3.h\n' \
+            b1dd5d74ec7f29055a6684fa06fb3c2f6821c87dd38f9a458dfd2e8a1db28189 \
+            919e7f2e8ed1d8f56ac17b412b8971c76aa5d1a879752cc6058f75e7d5910e1d \
+            | shasum -a 256 -c -
+
+      - name: Test (interpreter, target checks, native)
+        run: ./test.sh --native
