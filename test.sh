@@ -17,7 +17,9 @@ if [[ -z ${BEANSC:-} ]]; then
     fi
 fi
 
-if [[ -z "$BEANSC" || ! -x "$BEANSC" ]]; then
+# Windows launchers are .cmd files, which Git Bash can run but never
+# marks executable — an existing file is enough there.
+if [[ -z "$BEANSC" ]] || [[ ! -x "$BEANSC" && ! -f "$BEANSC" ]]; then
     echo "beansc not found: set BEANSC, set BEANS_ROOT, or put beansc on PATH" >&2
     exit 1
 fi
