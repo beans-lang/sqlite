@@ -35,6 +35,9 @@ jobs:
             curl -fsSL -o /tmp/beans.zip "$url"
             unzip -q /tmp/beans.zip -d "$HOME/beans-dist"
             echo "$HOME"/beans-dist/*/bin >> "$GITHUB_PATH"
+            # The Windows package launcher is beansc.cmd; bash has no
+            # PATHEXT, so hand test.sh the exact file.
+            echo "BEANSC=$(echo "$HOME"/beans-dist/*/bin/beansc.cmd)" >> "$GITHUB_ENV"
           else
             curl -fsSL https://github.com/beans-lang/beans/releases/latest/download/beans-install.sh | sh
             echo "$HOME/.beans/bin" >> "$GITHUB_PATH"
@@ -42,7 +45,7 @@ jobs:
 
       - name: Toolchain versions
         run: |
-          beansc --version
+          "${BEANSC:-beansc}" --version
           clang --version | head -1
 
       - name: Vendor integrity
