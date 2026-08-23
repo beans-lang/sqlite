@@ -34,6 +34,7 @@ jobs:
               -q '.assets[] | select(.name | endswith("x86_64-pc-windows-gnullvm.zip")) | .browser_download_url')
             curl -fsSL -o /tmp/beans.zip "$url"
             unzip -q /tmp/beans.zip -d "$HOME/beans-dist"
+            chmod +x "$HOME"/beans-dist/*/bin/* "$HOME"/beans-dist/*/toolchain/bin/* 2>/dev/null || true
             echo "$HOME"/beans-dist/*/bin >> "$GITHUB_PATH"
             # The Windows package launcher is beansc.cmd; bash has no
             # PATHEXT, so hand test.sh the exact file.
