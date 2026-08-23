@@ -23,14 +23,22 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Beans
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # Git Bash cannot auto-detect a Windows host triple; the
-          # gnullvm package is the full one (bundled toolchain).
           if [ "$RUNNER_OS" = "Windows" ]; then
-            export BEANS_TARGET=x86_64-pc-windows-gnullvm
+            # The 0.1.28 installer unpacks the Windows .zip with tar -xz,
+            # which Git Bash's GNU tar refuses; fetch and unzip directly
+            # until a release ships the installer fix.
+            url=$(gh api repos/beans-lang/beans/releases/latest \
+              -q '.assets[] | select(.name | endswith("x86_64-pc-windows-gnullvm.zip")) | .browser_download_url')
+            curl -fsSL -o /tmp/beans.zip "$url"
+            unzip -q /tmp/beans.zip -d "$HOME/beans-dist"
+            echo "$HOME"/beans-dist/*/bin >> "$GITHUB_PATH"
+          else
+            curl -fsSL https://github.com/beans-lang/beans/releases/latest/download/beans-install.sh | sh
+            echo "$HOME/.beans/bin" >> "$GITHUB_PATH"
           fi
-          curl -fsSL https://github.com/beans-lang/beans/releases/latest/download/beans-install.sh | sh
-          echo "$HOME/.beans/bin" >> "$GITHUB_PATH"
 
       - name: Toolchain versions
         run: |
