@@ -24,6 +24,11 @@ jobs:
 
       - name: Install Beans
         run: |
+          # Git Bash cannot auto-detect a Windows host triple; the
+          # gnullvm package is the full one (bundled toolchain).
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            export BEANS_TARGET=x86_64-pc-windows-gnullvm
+          fi
           curl -fsSL https://github.com/beans-lang/beans/releases/latest/download/beans-install.sh | sh
           echo "$HOME/.beans/bin" >> "$GITHUB_PATH"
 
