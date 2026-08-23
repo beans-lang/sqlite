@@ -14,7 +14,11 @@ jobs:
           - os: macos-latest
           - os: ubuntu-latest
           - os: ubuntu-24.04-arm
+          - os: windows-latest
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
 
