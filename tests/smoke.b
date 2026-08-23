@@ -13,6 +13,13 @@ fn main() {
         io.println("row {q.column_int(0)} {q.column_text(1)}")
     }
     q.finalize().expect("finalize")
+
+    // SQLITE_ENABLE_MATH_FUNCTIONS, served by libc — no libm link row.
+    let math: sqlite.Statement = db.prepare("SELECT CAST(pow(2, 10) AS INTEGER), CAST(sqrt(144.0) AS INTEGER)").expect("prepare math")
+    math.step().expect("step math")
+    io.println("math {math.column_int(0)} {math.column_int(1)}")
+    math.finalize().expect("finalize math")
+
     db.close().expect("close")
     io.println("smoke ok")
 }

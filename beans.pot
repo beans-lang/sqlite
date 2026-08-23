@@ -7,5 +7,8 @@ kind library
 # build choice is a #define inside this file.
 csrc all "src/beans_sqlite.c"
 
-# SQLITE_ENABLE_MATH_FUNCTIONS pulls in libm on Linux hosts.
-link linux library "m"
+# SQLITE_ENABLE_MATH_FUNCTIONS uses the libm functions, which every
+# supported libc serves from libc itself (glibc ≥ 2.34, musl, macOS,
+# Windows) — no link row needed. A `link linux library "m"` row would
+# also break `beansc run`: the interpreter dlopens manifest libraries by
+# their literal name, and "m" is not a loadable soname.

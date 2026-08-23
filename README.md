@@ -73,7 +73,8 @@ Rules the whole surface follows:
 
 Set in `src/beans_sqlite.c`, documented there: `SQLITE_THREADSAFE=1`
 (serialized — a Beans `deinit` may run on any thread), `SQLITE_DQS=0`,
-`SQLITE_OMIT_LOAD_EXTENSION`, `SQLITE_ENABLE_MATH_FUNCTIONS`.
+`SQLITE_OMIT_LOAD_EXTENSION`, `SQLITE_ENABLE_MATH_FUNCTIONS` (the math
+functions come from libc on every supported platform; no libm link row).
 
 `sys/sys.b` is generated for `arm64-apple-darwin` and used everywhere: the
 API is opaque-pointer-shaped, so the declarations are target-portable (a
