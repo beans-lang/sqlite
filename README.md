@@ -4,7 +4,7 @@ SQLite for Beans. The database compiles into your build from pinned,
 checksummed source — no system packages, no make step, no manual memory.
 
 ```beans
-import sqlite
+import github.com/beans-lang/sqlite
 
 fn main() {
     let db: sqlite.Database = sqlite.Database.open("app.db").expect("open")
@@ -28,7 +28,7 @@ fn main() {
 Add it to a project:
 
 ```
-beansc pot add github.com/beans-lang/sqlite v0.1.0
+beansc pot add github.com/beans-lang/sqlite v0.1.1
 ```
 
 The manifest's `csrc` row rides along: your build compiles the vendored

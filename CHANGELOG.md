@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.1 — 2026-09-16
+
+No library change. The README's example showed `import sqlite`; a consumer who
+follows `pot add` writes `import github.com/beans-lang/sqlite`. Tagged so
+cortado's cask example can pin a release instead of `require path "../sqlite"`.
+
 ## v0.1.0 — 2026-08-23
 
 - Initial release: SQLite 3.53.4 vendored (pinned + checksummed), OOP
