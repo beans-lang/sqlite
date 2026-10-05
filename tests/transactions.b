@@ -41,6 +41,14 @@ fn broken_transfer(db: sqlite.Database) -> Result<bool> {
     return tx.commit()
 }
 
+// Deferred constraints fail at COMMIT, after the insert already succeeded.
+// The transaction must remain live so `?` still rolls it back on scope exit.
+fn failed_commit(db: sqlite.Database) -> Result<bool> {
+    let tx: sqlite.Transaction = db.begin()?
+    db.exec("INSERT INTO children VALUES (99)")?
+    return tx.commit()
+}
+
 fn main() {
     let db: sqlite.Database = sqlite.Database.open_memory().expect("open")
     db.exec("CREATE TABLE accounts(name TEXT PRIMARY KEY, balance INTEGER NOT NULL)").expect("create")
@@ -97,6 +105,28 @@ fn main() {
     bulk.commit().expect("commit immediate")
     let carol_balance: int = balance(db, "carol")
     io.println("carol {carol_balance}")
+
+    db.exec("PRAGMA foreign_keys = ON; CREATE TABLE parents(id INTEGER PRIMARY KEY); CREATE TABLE children(parent_id INTEGER REFERENCES parents(id) DEFERRABLE INITIALLY DEFERRED)").expect("deferred schema")
+    match failed_commit(db) {
+        ok(done) => io.println("failed commit accepted {done}"),
+        err(error) => io.println("failed commit refused {error.kind}"),
+    }
+    let children: sqlite.Statement = db.prepare("SELECT COUNT(*) FROM children").expect("count children")
+    children.step().expect("step children")
+    io.println("after failed commit children {children.column_int(0)}")
+    children.finalize().expect("finalize children")
+
+    // A caller may repair the constraint and retry the same transaction.
+    let retry: sqlite.Transaction = db.begin().expect("begin retry")
+    db.exec("INSERT INTO children VALUES (1)").expect("deferred insert")
+    match retry.commit() {
+        ok(done) => io.println("deferred commit accepted {done}"),
+        err(error) => io.println("deferred commit refused {error.kind}"),
+    }
+    io.println("finished after refused commit {retry.is_finished()}")
+    db.exec("INSERT INTO parents VALUES (1)").expect("repair constraint")
+    retry.commit().expect("retry commit")
+    io.println("finished after retry {retry.is_finished()}")
 
     db.close().expect("close")
     io.println("transactions ok")

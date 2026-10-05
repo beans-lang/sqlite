@@ -31,6 +31,9 @@ Add it to a project:
 beansc pot add github.com/beans-lang/sqlite v0.1.1
 ```
 
+The transaction-recovery and Linux-link fixes, and the CLI pilot below, are
+unreleased checkout changes. The published `v0.1.1` tag does not include them.
+
 The manifest's `csrc` row rides along: your build compiles the vendored
 SQLite (3.53.4) with the same toolchain and target flags as your own code.
 First build pays for compiling sqlite3.c once; after that it comes from the
@@ -69,12 +72,47 @@ Rules the whole surface follows:
 | `vendor/` | upstream amalgamation, byte-identical, pinned in `VENDOR.md` (version, URL, SHA3-256 from sqlite.org, SHA-256) |
 | `tests/` | scenario tests with golden outputs — CRUD, transactions, lifecycle/memory, persistence (`./test.sh`, `./test.sh --native`) |
 
+## Data-processing pilot
+
+`examples/import_notes/` is a small CLI that strictly decodes a JSON array of
+`{"id": 1, "body": "note"}` records, inserts them through one reused prepared
+statement in one transaction, and reports them from a reopened read-only database.
+Positive IDs and nonempty bodies are enforced by SQLite constraints. A duplicate
+or invalid record rejects the whole import, including earlier rows in that batch.
+Failed commits remain unfinished so callers can repair and retry, explicitly roll
+back, or let scope-exit rollback run.
+Use a database created by this example. Arbitrary pre-existing `notes` schemas
+are not migrated or validated by this bounded pilot.
+
+From this repository with an installed compiler:
+
+```bash
+mkdir -p build
+beansc build examples/import_notes/main.b --locked --offline -o build/import_notes
+build/import_notes import notes.db examples/import_notes/notes.json
+build/import_notes report notes.db
+./test.sh --native
+```
+
+The example uses a local `require path` to exercise this checkout. Local dependencies
+are explicitly exempt from lock entries; these flags prove an offline local build,
+not immutable published-package resolution. A release consumer must pin a published
+tag and commit its generated `beans.lock` after `beansc pot tidy`.
+The acceptance test covers both backends, strict shape/type/syntax rejection,
+SQL-injection text as data, empty input, batch rollback, missing files, reopened
+persistence, and real cross-process SQLite lock contention. File-permission
+denial is checked where the current user/filesystem enforces it and explicitly
+skipped otherwise; the persistence suite always proves read-only connection denial.
+Input is read wholly into memory; this pilot is for small files. It is local
+acceptance evidence, with independent-user and sustained-use acceptance still pending.
+
 ## Build configuration
 
 Set in `src/beans_sqlite.c`, documented there: `SQLITE_THREADSAFE=1`
 (serialized — a Beans `deinit` may run on any thread), `SQLITE_DQS=0`,
-`SQLITE_OMIT_LOAD_EXTENSION`, `SQLITE_ENABLE_MATH_FUNCTIONS` (the math
-functions come from libc on every supported platform; no libm link row).
+`SQLITE_OMIT_LOAD_EXTENSION`, `SQLITE_ENABLE_MATH_FUNCTIONS`. Linux links
+`libm` through the existing manifest library row, shared by native builds and
+the interpreter. macOS and Windows use their platform C runtimes.
 
 `sys/sys.b` is generated for `arm64-apple-darwin` and used everywhere: the
 API is opaque-pointer-shaped, so the declarations are target-portable (a

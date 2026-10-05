@@ -25,13 +25,15 @@ pub class Transaction {
         }
     }
 
-    /// Makes the transaction's writes permanent.
+    /// Makes the transaction's writes permanent. A failed commit leaves the
+    /// transaction unfinished: repair and retry, roll back, or let deinit do it.
     pub fn commit() -> Result<bool> {
         if self.finished {
             return err("commit: transaction is already finished", "misuse")
         }
+        self.owner.exec("COMMIT")?
         self.finished = true
-        return self.owner.exec("COMMIT")
+        return ok(true)
     }
 
     /// Undoes the transaction's writes now, without waiting for `deinit`.
@@ -39,8 +41,9 @@ pub class Transaction {
         if self.finished {
             return err("rollback: transaction is already finished", "misuse")
         }
+        self.owner.exec("ROLLBACK")?
         self.finished = true
-        return self.owner.exec("ROLLBACK")
+        return ok(true)
     }
 
     /// True once committed or rolled back.

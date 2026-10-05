@@ -14,7 +14,7 @@ fn main() {
     }
     q.finalize().expect("finalize")
 
-    // SQLITE_ENABLE_MATH_FUNCTIONS, served by libc — no libm link row.
+    // SQLITE_ENABLE_MATH_FUNCTIONS, including Linux's manifest libm link.
     let math: sqlite.Statement = db.prepare("SELECT CAST(pow(2, 10) AS INTEGER), CAST(sqrt(144.0) AS INTEGER)").expect("prepare math")
     math.step().expect("step math")
     io.println("math {math.column_int(0)} {math.column_int(1)}")
