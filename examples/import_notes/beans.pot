@@ -1,0 +1,6 @@
+module import_notes
+kind application
+
+# This pilot exercises the current checkout without network resolution.
+# A published consumer uses github.com/beans-lang/sqlite and a pinned tag.
+require path "../.."

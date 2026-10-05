@@ -6,4 +6,9 @@ after broken alice 70
 double commit refused misuse
 nested begin refused sqlite
 carol 25
+failed commit refused constraint
+after failed commit children 0
+deferred commit refused constraint
+finished after refused commit false
+finished after retry true
 transactions ok

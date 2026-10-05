@@ -6,7 +6,9 @@ ROOT=$(cd "$(dirname "$0")" && pwd)
 # A compiler built from a Beans checkout resolves the standard library and
 # runtime relative to that checkout, so those runs happen from its root. An
 # installed beansc carries its own, and runs from anywhere.
-if [[ -z ${BEANS_ROOT:-} && -x "$ROOT/../../beans/build/beansc" ]]; then
+if [[ -z ${BEANS_ROOT:-} && -x "$ROOT/../beans/build/beansc" ]]; then
+    BEANS_ROOT=$(cd "$ROOT/../beans" && pwd)
+elif [[ -z ${BEANS_ROOT:-} && -x "$ROOT/../../beans/build/beansc" ]]; then
     BEANS_ROOT=$(cd "$ROOT/../../beans" && pwd)
 fi
 if [[ -z ${BEANSC:-} ]]; then
@@ -53,5 +55,8 @@ if [[ ${1:-} == "--native" ]]; then
         diff -u "$ROOT/tests/$name.out" "$tmp/$name.native"
     done
 fi
+
+export BEANSC
+bash "$ROOT/tests/import_notes.sh" "${1:-}"
 
 echo "ok sqlite: interpreter, target checks${1:+, native}"

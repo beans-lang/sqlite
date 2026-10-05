@@ -18,9 +18,8 @@
 // consumers get the strict behavior from day one.
 #define SQLITE_DQS 0
 
-// The SQL math functions (sin, log, pow, ...). Every supported libc keeps
-// these in libc itself (glibc >= 2.34, musl, macOS, Windows UCRT), so no
-// libm link row is needed.
+// The SQL math functions (sin, log, pow, ...). Linux's libm link is owned by
+// beans.pot, for both native builds and the interpreter's shared library.
 #define SQLITE_ENABLE_MATH_FUNCTIONS 1
 
 #include "../vendor/sqlite3.c"

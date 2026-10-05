@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Preserve an unfinished transaction after a rejected COMMIT or ROLLBACK, so
+  a failed deferred constraint commit still rolls back on scope exit and can
+  be repaired and retried through the same transaction handle.
+- Add the typed JSON-to-SQLite `import_notes` CLI pilot and acceptance checks
+  for interpreter/native execution, atomic failure, and reopened persistence.
+- Discover the sibling compiler checkout in the documented workspace layout.
+- Link the enabled SQLite math functions with libm on Linux; glibc still
+  requires that library, and the existing interpreter resolves its soname.
+
 ## v0.1.1 — 2026-09-16
 
 No library change. The README's example showed `import sqlite`; a consumer who
